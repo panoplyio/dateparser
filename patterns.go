@@ -75,6 +75,10 @@ func (p *Pattern) Match(matches ...MatchFn) *Pattern {
     return p
 }
 
+func (p *Pattern) MatchFmt(s string) *Pattern {
+    return p.Match(MatchFmt(s)...)
+}
+
 func (p *Pattern) Handle(fn HandleFn) *Pattern {
     p.HandleFn = fn
     return p

@@ -5,67 +5,62 @@ func Parse(b []byte) *Date {
     return Parser.Parse(b)
 }
 
-// named weekday
 var _ = Parser.Add().
-    Match(Weekday).
+    MatchFmt("Mon").
     Handle(func (d *Date, ts []*Token) int {
         d.weekday = ts[0].V
         return 1
     })
 
-// abbreviated timezone
 var _ = Parser.Add().
-    Match(Timezone).
+    MatchFmt("MST").
     Handle(func (d *Date, ts []*Token) int {
         d.tz = ts[0].V
         return 1
     })
 
-// 10h or "22 hours"
 var _ = Parser.Add().
-    Match(HH24, HoursName).
+    MatchFmt("15 hours").
     Handle(func (d *Date, ts []*Token) int {
         d.hour = ts[0].V
         return 2
     })
 
-// 10pm
 var _ = Parser.Add().
-    Match(HH12, AmPm).
+    MatchFmt("03 pm").
     Handle(func (d *Date, ts []*Token) int {
         d.hour = ts[0].V
         return 2
     })
 
-// 30m or "30 min"
 var _ = Parser.Add().
-    Match(MINSEC, MinsName).
+    MatchFmt("04 mins").
     Handle(func (d *Date, ts []*Token) int {
         d.minute = ts[0].V
         return 2
     })
 
-// 59s or "59 seconds"
 var _ = Parser.Add().
-    Match(MINSEC, SecsName).
+    MatchFmt("05 secs").
     Handle(func (d *Date, ts []*Token) int {
         d.second = ts[0].V
         return 2
     })
 
 // 10:24:05 am
-var _ = Parser.Add().
-    Match(HH24, TimeSep, MINSEC, TimeSep, MINSEC, AmPm).
-    Handle(func (d *Date, ts []*Token) int {
-        d.hour = ts[0].V
-        d.minute = ts[2].V
-        d.second = ts[4].V
-        return 6
-    })
+// var _ = Parser.Add().
+    // MatchFmt("(HH24) : (MINS) : (SECS) ampm").
+    // Match(HH24, TimeSep, MINSEC, TimeSep, MINSEC, AmPm).
+    // Handle(func (d *Date, ts []*Token) int {
+    //     d.hour = ts[0].V
+    //     d.minute = ts[2].V
+    //     d.second = ts[4].V
+    //     return 6
+    // })
 
 // 10:24:05
 var _ = Parser.Add().
-    Match(HH24, TimeSep, MINSEC, TimeSep, MINSEC).
+    MatchFmt("15 : 04 : 05").
     Handle(func (d *Date, ts []*Token) int {
         d.hour = ts[0].V
         d.minute = ts[2].V
@@ -73,9 +68,8 @@ var _ = Parser.Add().
         return 5
     })
 
-// 10:24 (either HH:MIN or MIN:SEC)
 var _ = Parser.Add().
-    Match(HH24, TimeSep, MINSEC).
+    MatchFmt("15 : 04").
     Handle(func (d *Date, ts []*Token) int {
         if d.hour == "" {
             d.hour = ts[0].V
@@ -88,9 +82,8 @@ var _ = Parser.Add().
         return 3
     })
 
-// 10:24 (either HH:MIN or MIN:SEC)
 var _ = Parser.Add().
-    Match(HH24, TimeSep, MINSEC, AmPm).
+    MatchFmt("15 : 04 pm").
     Handle(func (d *Date, ts []*Token) int {
         if d.hour == "" {
             d.hour = ts[0].V
@@ -103,9 +96,8 @@ var _ = Parser.Add().
         return 4
     })
 
-// YYYY-MM-DD or YYYY-Month-DD
 var _ = Parser.Add().
-    Match(YYYY, DateSep, Month, DateSep, DD).
+    MatchFmt("2006 - 01 - 02").
     Handle(func (d *Date, ts []*Token) int {
         d.year = ts[0].V
         d.month = ts[2].V
@@ -114,7 +106,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match(YYYY, Month, DD).
+    MatchFmt("2006 01 02").
     Handle(func (d *Date, ts []*Token) int {
         d.year = ts[0].V
         d.month = ts[1].V
@@ -123,7 +115,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match(DD, DateSep, Month, DateSep, YYYY).
+    MatchFmt("02 - 01 - 2006").
     Handle(func (d *Date, ts []*Token) int {
         d.day = ts[0].V
         d.month = ts[2].V
@@ -132,7 +124,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match(DD, Month, YYYY).
+    MatchFmt("02 01 2006").
     Handle(func (d *Date, ts []*Token) int {
         d.day = ts[0].V
         d.month = ts[1].V
@@ -140,9 +132,8 @@ var _ = Parser.Add().
         return 3
     })
 
-
 var _ = Parser.Add().
-    Match(Month, DateSep, DD, DateSep, YYYY).
+    MatchFmt("01 - 02 - 2006").
     Handle(func (d *Date, ts []*Token) int {
         d.month = ts[0].V
         d.day = ts[2].V
@@ -151,7 +142,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match(Month, DD, YYYY).
+    MatchFmt("01 02 2006").
     Handle(func (d *Date, ts []*Token) int {
         d.month = ts[0].V
         d.day = ts[1].V
@@ -160,6 +151,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
+    MatchFmt("02 - 01 - 06").
     Match(DD, DateSep, Month, DateSep, YY).
     Handle(func (d *Date, ts []*Token) int {
         d.day = ts[0].V
@@ -168,25 +160,22 @@ var _ = Parser.Add().
         return 5
     })
 
-// named month
 var _ = Parser.Add().
-    Match(MonthName).
+    MatchFmt("Jan").
     Handle(func (d *Date, ts []*Token) int {
         d.month = ts[0].V
         return 1
     })
 
-// timezone offset: -0300
 var _ = Parser.Add().
-    Match(Sign, TZOffset).
+    MatchFmt("+- 0700").
     Handle(func (d *Date, ts []*Token) int {
         d.tzoffset = ts[0].V + ts[1].V
         return 2
     })
 
-// timezone offset: -03:00
 var _ = Parser.Add().
-    Match(Sign, HH12, TimeSep, MINSEC).
+    MatchFmt("+- 07 : 00").
     Handle(func (d *Date, ts []*Token) int {
         d.tzoffset = ts[0].V + ts[1].V + ts[3].V
         return 4
@@ -236,9 +225,8 @@ var _ = Parser.Add().
         return 1
     })
 
-// YYYY
 var _ = Parser.Add().
-    Match(YYYY).
+    MatchFmt("2006").
     Handle(func (d *Date, ts []*Token) int {
         if d.year != "" {
             return 0
@@ -261,7 +249,6 @@ var _ = Parser.Add().
         return 1
     })
 
-// HHMM
 var _ = Parser.Add().
     Match(HHMM).
     Handle(func (d *Date, ts []*Token) int {
@@ -274,9 +261,8 @@ var _ = Parser.Add().
         return 1
     })
 
-// DD
 var _ = Parser.Add().
-    Match(DD).
+    MatchFmt("02").
     Handle(func (d *Date, ts []*Token) int {
         if d.day != "" {
             return 0
@@ -286,9 +272,8 @@ var _ = Parser.Add().
         return 1
     })
 
-// MM
 var _ = Parser.Add().
-    Match(MM).
+    MatchFmt("01").
     Handle(func (d *Date, ts []*Token) int {
         if d.month != "" {
             return 0
@@ -298,9 +283,8 @@ var _ = Parser.Add().
         return 1
     })
 
-// YY
 var _ = Parser.Add().
-    Match(YY).
+    MatchFmt("06").
     Handle(func (d *Date, ts []*Token) int {
         if d.year != "" {
             return 0
@@ -310,9 +294,8 @@ var _ = Parser.Add().
         return 1
     })
 
-// HH
 var _ = Parser.Add().
-    Match(HH24).
+    MatchFmt("15").
     Handle(func (d *Date, ts []*Token) int {
         if d.hour != "" {
             return 0
