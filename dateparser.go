@@ -175,6 +175,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
+    // MatchFmt("-0700")
     MatchFmt("+- 07 : 00").
     Handle(func (d *Date, ts []*Token) int {
         d.tzoffset = ts[0].V + ts[1].V + ts[3].V
@@ -182,6 +183,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
+    // MatchFmt("20060102150405")
     Match(YYYYMMDDHHMMSS).
     Handle(func (d *Date, ts []*Token) int {
         if d.year != "" || d.month != "" || d.day != "" {

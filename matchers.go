@@ -7,56 +7,37 @@ import (
 type MatchFn func(*Token) bool
 
 func MatchFmt(s string) []MatchFn {
+    matchersmap := map[string]MatchFn{
+        "2006": YYYY,
+        "06": YY,
+        "01": Month,
+        "Jan": MonthName,
+        "02": DD,
+        "Mon": Weekday,
+        "MST": Timezone,
+        "0700": TZOffset,
+        "07": HH12,
+        "15": HH24,
+        "03": HH12,
+        "04": MINSEC,
+        "05": MINSEC,
+        "00": MINSEC,
+        "hours": HoursName,
+        "mins": MinsName,
+        "secs": SecsName,
+        "pm": AmPm,
+        "/": DateSep,
+        "-": DateSep,
+        ":": TimeSep,
+        "+-": Sign,
+    }
+
     comps := strings.Split(s, " ")
     matchers := make([]MatchFn, len(comps))
 
     for i, comp := range comps {
-        switch comp {
-        case "2006":
-            matchers[i] = YYYY
-        case "06":
-            matchers[i] = YY
-        case "01":
-            matchers[i] = Month
-        case "Jan":
-            matchers[i] = MonthName
-        case "02":
-            matchers[i] = DD
-        case "Mon":
-            matchers[i] = Weekday
-        case "MST":
-            matchers[i] = Timezone
-        case "0700":
-            matchers[i] = TZOffset
-        case "07":
-            matchers[i] = HH12
-        case "15":
-            matchers[i] = HH24
-        case "03":
-            matchers[i] = HH12
-        case "04":
-            matchers[i] = MINSEC
-        case "05":
-            matchers[i] = MINSEC
-        case "00":
-            matchers[i] = MINSEC
-        case "hours":
-            matchers[i] = HoursName
-        case "mins":
-            matchers[i] = MinsName
-        case "secs":
-            matchers[i] = SecsName
-        case "pm":
-            matchers[i] = AmPm
-        case "/":
-            matchers[i] = DateSep
-        case "-":
-            matchers[i] = DateSep
-        case ":":
-            matchers[i] = TimeSep
-        case "+-":
-            matchers[i] = Sign
-        default:
+        matchers[i] = matchersmap[comp]
+        if matchers[i] == nil {
             panic("Unknown format: " + comp)
         }
     }
