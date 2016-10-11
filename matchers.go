@@ -7,38 +7,50 @@ import (
 type MatchFn func(*Token) bool
 
 func MatchFmt(s string) []MatchFn {
-    matchersmap := map[string]MatchFn{
-        "2006": YYYY,
-        "06": YY,
-        "01": Month,
-        "Jan": MonthName,
-        "02": DD,
-        "Mon": Weekday,
-        "MST": Timezone,
-        "0700": TZOffset,
-        "07": HH12,
-        "15": HH24,
-        "03": HH12,
-        "04": MINSEC,
-        "05": MINSEC,
-        "00": MINSEC,
-        "hours": HoursName,
-        "mins": MinsName,
-        "secs": SecsName,
-        "pm": AmPm,
-        "/": DateSep,
-        "-": DateSep,
-        ":": TimeSep,
-        "+-": Sign,
+    allmatchers := []struct{prefix string; matcher MatchFn}{
+        {"2006", YYYY},
+        {"06", YY},
+        {"01", Month},
+        {"Jan", MonthName},
+        {"02", DD},
+        {"Mon", Weekday},
+        {"MST", Timezone},
+        {"0700", TZOffset},
+        {"07", HH12},
+        {"15", HH24},
+        {"03", HH12},
+        {"04", MINSEC},
+        {"05", MINSEC},
+        {"00", MINSEC},
+        {"hours", HoursName},
+        {"mins", MinsName},
+        {"secs", SecsName},
+        {"pm", AmPm},
+        {"/", DateSep},
+        {"-", DateSep},
+        {":", TimeSep},
+        {"+-", Sign},
     }
 
-    comps := strings.Split(s, " ")
-    matchers := make([]MatchFn, len(comps))
+    matchers := []MatchFn{}
+    for len(s) > 0 {
+        if s[0] == ' ' {
+            s = s[1:] // skip spaces
+            continue
+        }
 
-    for i, comp := range comps {
-        matchers[i] = matchersmap[comp]
-        if matchers[i] == nil {
-            panic("Unknown format: " + comp)
+        found := false
+        for _, m := range allmatchers {
+            if strings.HasPrefix(s, m.prefix) {
+                found = true
+                matchers = append(matchers, m.matcher)
+                s = s[len(m.prefix):]
+                break
+            }
+        }
+
+        if !found {
+            panic("Unrecognized format:" + s)
         }
     }
 

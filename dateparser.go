@@ -60,7 +60,7 @@ var _ = Parser.Add().
 
 // 10:24:05
 var _ = Parser.Add().
-    MatchFmt("15 : 04 : 05").
+    MatchFmt("15:04:05").
     Handle(func (d *Date, ts []*Token) int {
         d.hour = ts[0].V
         d.minute = ts[2].V
@@ -69,7 +69,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("15 : 04").
+    MatchFmt("15:04").
     Handle(func (d *Date, ts []*Token) int {
         if d.hour == "" {
             d.hour = ts[0].V
