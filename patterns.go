@@ -8,7 +8,7 @@ type HandleFn func(d *Date, ts []*Token) bool
 
 type Pattern struct {
     children []*Pattern
-    Matchers []MatchFn
+    Matchers []*Matcher
     HandleFn HandleFn
 }
 
@@ -49,8 +49,8 @@ func (p *Pattern) parse(d *Date, ts []*Token) int {
         return 0
     }
 
-    for i, match := range p.Matchers {
-        if !match(ts[i]) {
+    for i, matcher := range p.Matchers {
+        if !matcher.Match(ts[i]) {
             return 0 // unmatched.
         }
     }
@@ -73,7 +73,7 @@ func (p *Pattern) parse(d *Date, ts []*Token) int {
 }
 
 func (p *Pattern) Match(s string) *Pattern {
-    allmatchers := []struct{prefix string; matcher *Matcher}{
+    allmatchers := []*Matcher{
         {"2006", YYYY},
         {"06", YY},
         {"01", Month},
@@ -99,7 +99,33 @@ func (p *Pattern) Match(s string) *Pattern {
         {":", TimeSep},
     }
 
-    matchers := []MatchFn{}
+    // allmatchers := []struct{prefix string; matcher *Matcher}{
+    //     {"2006", YYYY},
+    //     {"06", YY},
+    //     {"01", Month},
+    //     {"Jan", MonthName},
+    //     {"02", DD},
+    //     {"Mon", Weekday},
+    //     {"MST", Timezone},
+    //     {"0700", TimezoneOffset},
+    //     {"15", HH24},
+    //     {"03", HH12},
+    //     {"07", HH12}, // used for timezone offsets (07:00)
+    //     {"04", MINS},
+    //     {"05", SECS},
+    //     {"00", SECS}, // used for timezone offsets (07:00)
+    //     {"pm", AmPm},
+    //     {"-", Sign},
+
+    //     // uncaptured.
+    //     {"hours", HoursName},
+    //     {"mins", MinsName},
+    //     {"secs", SecsName},
+    //     {"/", DateSep},
+    //     {":", TimeSep},
+    // }
+
+    matchers := []*Matcher{}
     for len(s) > 0 {
         if s[0] == ' ' {
             s = s[1:] // skip spaces
@@ -108,10 +134,10 @@ func (p *Pattern) Match(s string) *Pattern {
 
         found := false
         for _, m := range allmatchers {
-            if strings.HasPrefix(s, m.prefix) {
+            if strings.HasPrefix(s, m.Fmt) {
                 found = true
-                matchers = append(matchers, m.matcher.Match)
-                s = s[len(m.prefix):]
+                matchers = append(matchers, m)
+                s = s[len(m.Fmt):]
                 break
             }
         }
@@ -186,26 +212,20 @@ var Month = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "Nov", "Dec"})
 
 // 4-digit year
-var YYYY = &Matcher{
-    Match: func(t *Token) bool {
-        return t.IsNumber() && t.IsLen(4)
-    },
+var YYYY = func(t *Token) bool {
+    return t.IsNumber() && t.IsLen(4)
 }
 
 // 2-digit year
-var YY = &Matcher{
-    Match: func(t *Token) bool {
-        return t.IsNumber() && t.IsLen(2)
-    },
+var YY = func(t *Token) bool {
+    return t.IsNumber() && t.IsLen(2)
 }
 
 // 4-digits timezone offset: HHMM
-var TimezoneOffset = &Matcher{
-    Match: func(t *Token) bool {
-        return t.IsNumber() && t.IsLen(4) &&
-            HH12.Match(&Token{t.V[:2], t.T}) &&
-            MINS.Match(&Token{t.V[2:4], t.T})
-    },
+var TimezoneOffset = func(t *Token) bool {
+    return t.IsNumber() && t.IsLen(4) &&
+        HH12(&Token{t.V[:2], t.T}) &&
+        MINS(&Token{t.V[2:4], t.T})
 }
 
 // named timezone
