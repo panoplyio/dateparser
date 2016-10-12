@@ -40,6 +40,11 @@ var _ = Parser.Add().
     Match("03 pm").
     Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].Number()
+
+        if ts[1].V == "pm" {
+            d.hour += 12
+        }
+
         return true
     })
 
@@ -57,7 +62,21 @@ var _ = Parser.Add().
         return true
     })
 
-// 10:24:05
+var _ = Parser.Add().
+    Match("03:04:05 pm").
+    Handle(func (d *Date, ts []*Token) bool {
+        d.hour = ts[0].Number()
+        d.minute = ts[2].Number()
+        d.second = ts[4].Number()
+
+        if ts[5].V == "pm" {
+            d.hour += 12
+        }
+
+        return true
+    })
+
+
 var _ = Parser.Add().
     Match("15:04:05").
     Handle(func (d *Date, ts []*Token) bool {
@@ -68,21 +87,20 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match("15:04").
+    Match("03:04 pm").
     Handle(func (d *Date, ts []*Token) bool {
-        if d.hour == 0 {
-            d.hour = ts[0].Number()
-            d.minute = ts[2].Number()
-        } else {
-            d.minute = ts[0].Number()
-            d.second = ts[2].Number()
+        d.hour = ts[0].Number()
+        d.minute = ts[2].Number()
+
+        if ts[3].V == "pm" {
+            d.hour += 12
         }
 
         return true
     })
 
 var _ = Parser.Add().
-    Match("15:04 pm").
+    Match("15:04").
     Handle(func (d *Date, ts []*Token) bool {
         if d.hour == 0 {
             d.hour = ts[0].Number()

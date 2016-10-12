@@ -240,6 +240,10 @@ var tests = []struct{s string; e string}{
         "10:00 am",
         "2006-01-02 10:04:05 +0000 UTC",
     },
+    {
+        "10:00 pm",
+        "2006-01-02 22:04:05 +0000 UTC",
+    },
 }
 
 func TestParse(t *testing.T) {
