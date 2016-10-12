@@ -4,7 +4,7 @@ import (
     // "fmt"
 )
 
-type HandleFn func(d *Date, ts []*Token) int
+type HandleFn func(d *Date, ts []*Token) bool
 
 type Pattern struct {
     children []*Pattern
@@ -23,16 +23,6 @@ func (p *Pattern) Add() *Pattern {
 
     ptn := &Pattern{}
     p.children = append(p.children, ptn)
-
-    p.Handle(func(d *Date, ts []*Token) int {
-        for _, ptn := range p.children {
-            if n := ptn.parse(d, ts); n > 0 {
-                return n
-            }
-        }
-
-        return 0
-    })
 
     return ptn
 }
@@ -55,19 +45,31 @@ func (p *Pattern) Parse(b []byte) *Date {
 }
 
 func (p *Pattern) parse(d *Date, ts []*Token) int {
-    if p.Matches != nil {
-        if len(ts) < len(p.Matches) {
-            return 0
-        }
+    if len(ts) < len(p.Matches) {
+        return 0
+    }
 
-        for i, match := range p.Matches {
-            if !match(ts[i]) {
-                return 0 // unmatched.
-            }
+    for i, match := range p.Matches {
+        if !match(ts[i]) {
+            return 0 // unmatched.
         }
     }
 
-    return p.HandleFn(d, ts)
+    if len(p.children) > 0 {
+        for _, ptn := range p.children {
+            if n := ptn.parse(d, ts); n > 0 {
+                return n
+            }
+        }
+
+        return 0
+    }
+
+    if p.HandleFn(d, ts) {
+        return len(p.Matches)
+    } else {
+        return 0
+    }
 }
 
 func (p *Pattern) Match(matches ...MatchFn) *Pattern {

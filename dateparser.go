@@ -7,44 +7,44 @@ func Parse(b []byte) *Date {
 
 var _ = Parser.Add().
     MatchFmt("Mon").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.weekday = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("MST").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.tz = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("15 hours").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
-        return 2
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("03 pm").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
-        return 2
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("04 mins").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.minute = ts[0].V
-        return 2
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("05 secs").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.second = ts[0].V
-        return 2
+        return true
     })
 
 // 10:24:05 am
@@ -61,16 +61,16 @@ var _ = Parser.Add().
 // 10:24:05
 var _ = Parser.Add().
     MatchFmt("15:04:05").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
         d.minute = ts[2].V
         d.second = ts[4].V
-        return 5
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("15:04").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.hour == "" {
             d.hour = ts[0].V
             d.minute = ts[2].V
@@ -79,12 +79,12 @@ var _ = Parser.Add().
             d.second = ts[2].V
         }
 
-        return 3
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("15:04 pm").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.hour == "" {
             d.hour = ts[0].V
             d.minute = ts[2].V
@@ -93,148 +93,147 @@ var _ = Parser.Add().
             d.second = ts[2].V
         }
 
-        return 4
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("2006-01-02").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.year = ts[0].V
         d.month = ts[2].V
         d.day = ts[4].V
-        return 5
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("2006 01 02").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.year = ts[0].V
         d.month = ts[1].V
         d.day = ts[2].V
-        return 3
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("02-01-2006").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[2].V
         d.year = ts[4].V
-        return 5
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("02 01 2006").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[1].V
         d.year = ts[2].V
-        return 3
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("01-02-2006").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
         d.day = ts[2].V
         d.year = ts[4].V
-        return 5
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("01 02 2006").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
         d.day = ts[1].V
         d.year = ts[2].V
-        return 3
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("02-01-06").
-    Match(DD, DateSep, Month, DateSep, YY).
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[2].V
         d.year = ts[4].V
-        return 5
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("Jan").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("+-0700").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.tzoffset = ts[0].V + ts[1].V
-        return 2
+        return true
     })
 
 var _ = Parser.Add().
     // MatchFmt("-0700")
     MatchFmt("+-07:00").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         d.tzoffset = ts[0].V + ts[1].V + ts[3].V
-        return 4
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("2006").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.year != "" {
-            return 0
+            return false
         }
 
         d.year = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("02").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.day != "" {
-            return 0
+            return false
         }
 
         d.day = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("01").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.month != "" {
-            return 0
+            return false
         }
 
         d.month = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("06").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.year != "" {
-            return 0
+            return false
         }
 
         d.year = ts[0].V
-        return 1
+        return true
     })
 
 var _ = Parser.Add().
     MatchFmt("15").
-    Handle(func (d *Date, ts []*Token) int {
+    Handle(func (d *Date, ts []*Token) bool {
         if d.hour != "" {
-            return 0
+            return false
         }
 
         d.hour = ts[0].V
-        return 1
+        return true
     })
 
 
