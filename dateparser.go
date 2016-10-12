@@ -194,31 +194,6 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    Match(HHMMSS).
-    Handle(func (d *Date, ts []*Token) int {
-        if d.hour != "" || d.minute != "" || d.second != "" {
-            return 0
-        }
-
-        d.hour = ts[0].V[:2]
-        d.minute = ts[0].V[2:4]
-        d.second = ts[0].V[4:6]
-        return 1
-    })
-
-var _ = Parser.Add().
-    Match(HHMM).
-    Handle(func (d *Date, ts []*Token) int {
-        if d.hour != "" || d.minute != "" {
-            return 0
-        }
-
-        d.hour = ts[0].V[:2]
-        d.minute = ts[0].V[2:4]
-        return 1
-    })
-
-var _ = Parser.Add().
     MatchFmt("02").
     Handle(func (d *Date, ts []*Token) int {
         if d.day != "" {
