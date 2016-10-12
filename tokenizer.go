@@ -18,7 +18,7 @@ func (t *Timelex) Next() *Token {
     state := ""
 
     if t.idx >= len(t.buffer) {
-        return &Token{"", "EOF"}
+        return &Token{"", "EOF", 0}
     }
 
 L:
@@ -58,7 +58,7 @@ L:
         t.idx += 1
     }
 
-    return &Token{string(token), state}
+    return &Token{string(token), state, 0}
 }
 
 
@@ -73,6 +73,7 @@ func IsDigit(b byte) bool {
 type Token struct {
     V string
     T string
+    N int
 }
 
 func (t *Token) IsEOF() bool {
@@ -81,6 +82,33 @@ func (t *Token) IsEOF() bool {
 
 func (t *Token) IsNumber() bool {
     return t.T == "0"
+}
+
+func (t *Token) Number() int {
+    if t.N > 0 {
+        return t.N
+    }
+
+    n := 0
+    for _, b := range t.V {
+        n *= 10
+        n += int(b) - 48
+    }
+
+    return n
+}
+
+func (t *Token) NumberYear() int {
+    year := t.Number()
+
+    // heuristic taken from python's dateutil.parser
+    if year >= 100 {
+        return year
+    } else if year > 65 {
+        return year + 1900 // 96 => 1996
+    } else {
+        return year + 2000 // 12 => 2012
+    }
 }
 
 func (t *Token) IsLen(vs ...int) bool {

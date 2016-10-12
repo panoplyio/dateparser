@@ -1,6 +1,7 @@
 package dateparser
 
 import (
+    "time"
     "strings"
 )
 
@@ -27,7 +28,7 @@ func (p *Pattern) Add() *Pattern {
     return ptn
 }
 
-func (p *Pattern) Parse(b []byte) *Date {
+func (p *Pattern) Parse(b []byte, def *time.Time) *Date {
     tokens := (&Timelex{b, 0}).All()
     date := &Date{}
 
@@ -41,7 +42,7 @@ func (p *Pattern) Parse(b []byte) *Date {
         idx += n
     }
 
-    return date
+    return date.AddDefault(def)
 }
 
 func (p *Pattern) parse(d *Date, ts []*Token) int {
@@ -98,32 +99,6 @@ func (p *Pattern) Match(s string) *Pattern {
         {"/", DateSep},
         {":", TimeSep},
     }
-
-    // allmatchers := []struct{prefix string; matcher *Matcher}{
-    //     {"2006", YYYY},
-    //     {"06", YY},
-    //     {"01", Month},
-    //     {"Jan", MonthName},
-    //     {"02", DD},
-    //     {"Mon", Weekday},
-    //     {"MST", Timezone},
-    //     {"0700", TimezoneOffset},
-    //     {"15", HH24},
-    //     {"03", HH12},
-    //     {"07", HH12}, // used for timezone offsets (07:00)
-    //     {"04", MINS},
-    //     {"05", SECS},
-    //     {"00", SECS}, // used for timezone offsets (07:00)
-    //     {"pm", AmPm},
-    //     {"-", Sign},
-
-    //     // uncaptured.
-    //     {"hours", HoursName},
-    //     {"mins", MinsName},
-    //     {"secs", SecsName},
-    //     {"/", DateSep},
-    //     {":", TimeSep},
-    // }
 
     matchers := []*Matcher{}
     for len(s) > 0 {
@@ -188,9 +163,25 @@ var DD = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "24", "25", "26", "27", "28", "29", "30", "31"})
 
 // weekday names
-var Weekday = Match([]string{"Sunday", "Monday", "Tuesday", "Wednesday",
-    "Thursday", "Friday", "Saturday", "Sun", "Mon", "Tue", "Tues", "Wed",
-    "Thu", "Thur", "Thurs", "Fri", "Sat"})
+var Weekday = MatchMap(map[string]int{
+    "Sunday": 1,
+    "Sun": 1,
+    "Monday": 2,
+    "Mon": 2,
+    "Tuesday": 3,
+    "Tues": 3,
+    "Tue": 3,
+    "Wednesday": 4,
+    "Wed": 4,
+    "Thursday": 5,
+    "Thurs": 5,
+    "Thur": 5,
+    "Thu": 5,
+    "Friday": 6,
+    "Fri": 6,
+    "Saturday": 7,
+    "Sat": 7,
+})
 
 // 12-months
 var MM = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -198,18 +189,81 @@ var MM = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "12"})
 
 // month names
-var MonthName = Match([]string{"January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "Novemeber", "December",
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
-    "Nov", "Dec"})
+var MonthName = MatchMap(map[string]int{
+    "January": 1,
+    "Jan": 1,
+    "February": 2,
+    "Feb": 2,
+    "March": 3,
+    "Mar": 3,
+    "April": 4,
+    "Apr": 4,
+    "May": 5,
+    "June": 6,
+    "Jun": 6,
+    "July": 7,
+    "Jul": 7,
+    "August": 8,
+    "Aug": 8,
+    "September": 9,
+    "Sept": 9,
+    "Sep": 9,
+    "October": 10,
+    "Oct": 10,
+    "Novemeber": 11,
+    "Nov": 11,
+    "December": 12,
+    "Dec": 12,
+})
 
 // month: either name or MM
-var Month = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
-    "12", "January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "Novemeber", "December",
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
-    "Nov", "Dec"})
+var Month = MatchMap(map[string]int{
+    "January": 1,
+    "Jan": 1,
+    "01": 1,
+    "1": 1,
+    "February": 2,
+    "Feb": 2,
+    "02": 2,
+    "2": 2,
+    "March": 3,
+    "Mar": 3,
+    "03": 3,
+    "3": 3,
+    "April": 4,
+    "Apr": 4,
+    "04": 4,
+    "4": 4,
+    "May": 5,
+    "05": 5,
+    "5": 5,
+    "June": 6,
+    "Jun": 6,
+    "06": 6,
+    "6": 6,
+    "July": 7,
+    "Jul": 7,
+    "07": 7,
+    "7": 7,
+    "August": 8,
+    "Aug": 8,
+    "08": 8,
+    "8": 8,
+    "September": 9,
+    "Sept": 9,
+    "Sep": 9,
+    "09": 9,
+    "9": 9,
+    "October": 10,
+    "Oct": 10,
+    "10": 10,
+    "Novemeber": 11,
+    "Nov": 11,
+    "11": 11,
+    "December": 12,
+    "Dec": 12,
+    "12": 12,
+})
 
 // 4-digit year
 var YYYY = func(t *Token) bool {
@@ -224,8 +278,8 @@ var YY = func(t *Token) bool {
 // 4-digits timezone offset: HHMM
 var TimezoneOffset = func(t *Token) bool {
     return t.IsNumber() && t.IsLen(4) &&
-        HH12(&Token{t.V[:2], t.T}) &&
-        MINS(&Token{t.V[2:4], t.T})
+        HH12(&Token{t.V[:2], t.T, 0}) &&
+        MINS(&Token{t.V[2:4], t.T, 0})
 }
 
 // named timezone

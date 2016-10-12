@@ -19,3 +19,15 @@ func Match(vs []string) MatchFn {
     }
 }
 
+func MatchMap(vs map[string]int) MatchFn {
+    return func(t *Token) bool {
+        v := vs[t.V]
+        if v == 0 {
+            return false
+        }
+
+        t.N = v
+        return true
+    }
+}
+
