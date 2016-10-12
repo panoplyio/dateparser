@@ -87,37 +87,9 @@ var tests = []struct{s string; e string}{
         "2003-09-25",
         "&{2003 09 25      }",
     },
-    {   // ISO-8601 stripped format
-        "20030925T104941.5-0300",
-        "&{2003 09 25 10 49 41   -0300}",
-    },
-    {   // ISO-8601 stripped format & timezone
-        "20030925T104941",
-        "&{2003 09 25 10 49 41   }",
-    },
-    {   // ISO-8601 stripped format & seconds
-        "20030925T1049",
-        "&{2003 09 25 10 49    }",
-    },
-    {   // ISO-8601 stripped format & minutes
-        "20030925T10",
-        "&{2003 09 25 10     }",
-    },
-    {   // ISO-8601 stripped format & hours
-        "20030925",
-        "&{2003 09 25      }",
-    },
     {   // Python Logger
         "2003-09-25 10:49:41,502",
         "&{2003 09 25 10 49 41   }",
-    },
-    {   // no separator
-        "19970902090807",
-        "&{1997 09 02 09 08 07   }",
-    },
-    {   // no separator stripped seconds
-        "199709020908",
-        "&{1997 09 02 09 08    }",
     },
     {   // dashed date
         "2003-09-25",

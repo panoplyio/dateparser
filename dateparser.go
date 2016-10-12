@@ -183,51 +183,6 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    // MatchFmt("20060102150405")
-    Match(YYYYMMDDHHMMSS).
-    Handle(func (d *Date, ts []*Token) int {
-        if d.year != "" || d.month != "" || d.day != "" {
-            return 0
-        }
-
-        d.year = ts[0].V[:4]
-        d.month = ts[0].V[4:6]
-        d.day = ts[0].V[6:8]
-        d.hour = ts[0].V[8:10]
-        d.minute = ts[0].V[10:12]
-        d.second = ts[0].V[12:14]
-        return 1
-    })
-
-var _ = Parser.Add().
-    Match(YYYYMMDDHHMM).
-    Handle(func (d *Date, ts []*Token) int {
-        if d.year != "" || d.month != "" || d.day != "" {
-            return 0
-        }
-
-        d.year = ts[0].V[:4]
-        d.month = ts[0].V[4:6]
-        d.day = ts[0].V[6:8]
-        d.hour = ts[0].V[8:10]
-        d.minute = ts[0].V[10:12]
-        return 1
-    })
-
-var _ = Parser.Add().
-    Match(YYYYMMDD).
-    Handle(func (d *Date, ts []*Token) int {
-        if d.year != "" || d.month != "" || d.day != "" {
-            return 0
-        }
-
-        d.year = ts[0].V[:4]
-        d.month = ts[0].V[4:6]
-        d.day = ts[0].V[6:8]
-        return 1
-    })
-
-var _ = Parser.Add().
     MatchFmt("2006").
     Handle(func (d *Date, ts []*Token) int {
         if d.year != "" {
