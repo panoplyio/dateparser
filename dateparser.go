@@ -287,21 +287,6 @@ var Weekday = Match([]string{"Sunday", "Monday", "Tuesday", "Wednesday",
 var Whitespace = Match([]string{" ", "\n", "\t", "\r"})
 
 var YYYY = MatchNumberLen(4)
-var YYYYMMDD = MatchAnd(MatchSub(0, 4, YYYY),
-    MatchSub(4, 6, MM),
-    MatchSub(6, 8, DD))
-
-var HHMM = MatchAnd(MatchSub(0, 2, HH24), 
-    MatchSub(2, 4, MINSEC))
-
-var HHMMSS = MatchAnd(MatchSub(0, 4, HHMM),
-    MatchSub(4, 6, MINSEC))
-
-var YYYYMMDDHHMMSS = MatchAnd(MatchSub(0, 8, YYYYMMDD),
-    MatchSub(8, 14, HHMMSS))
-
-var YYYYMMDDHHMM = MatchAnd(MatchSub(0, 8, YYYYMMDD),
-    MatchSub(8, 12, HHMM))
 
 // var HHMMSS = 
 var YY = MatchNumberLen(2)
