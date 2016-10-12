@@ -1,7 +1,7 @@
 package dateparser
 
 import (
-    // "fmt"
+    "strings"
 )
 
 type HandleFn func(d *Date, ts []*Token) bool
@@ -72,13 +72,56 @@ func (p *Pattern) parse(d *Date, ts []*Token) int {
     }
 }
 
-func (p *Pattern) Match(matches ...MatchFn) *Pattern {
-    p.Matches = matches
-    return p
-}
+func (p *Pattern) Match(s string) *Pattern {
+    allmatchers := []struct{prefix string; matcher *Matcher}{
+        {"2006", YYYY},
+        {"06", YY},
+        {"01", Month},
+        {"Jan", MonthName},
+        {"02", DD},
+        {"Mon", Weekday},
+        {"MST", Timezone},
+        {"0700", TimezoneOffset},
+        {"07", HH12},
+        {"15", HH24},
+        {"03", HH12},
+        {"04", MINS},
+        {"05", SECS},
+        {"00", SECS},
+        {"hours", HoursName},
+        {"mins", MinsName},
+        {"secs", SecsName},
+        {"pm", AmPm},
+        {"/", DateSep},
+        {"-", DateSep},
+        {":", TimeSep},
+        {"+-", Sign},
+    }
 
-func (p *Pattern) MatchFmt(s string) *Pattern {
-    return p.Match(MatchFmt(s)...)
+    matchers := []MatchFn{}
+    for len(s) > 0 {
+        if s[0] == ' ' {
+            s = s[1:] // skip spaces
+            continue
+        }
+
+        found := false
+        for _, m := range allmatchers {
+            if strings.HasPrefix(s, m.prefix) {
+                found = true
+                matchers = append(matchers, m.matcher.Match)
+                s = s[len(m.prefix):]
+                break
+            }
+        }
+
+        if !found {
+            panic("Unrecognized format:" + s)
+        }
+    }
+
+    p.Matches = matchers
+    return p
 }
 
 func (p *Pattern) Handle(fn HandleFn) *Pattern {

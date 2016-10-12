@@ -6,42 +6,42 @@ func Parse(b []byte) *Date {
 }
 
 var _ = Parser.Add().
-    MatchFmt("Mon").
+    Match("Mon").
     Handle(func (d *Date, ts []*Token) bool {
         d.weekday = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("MST").
+    Match("MST").
     Handle(func (d *Date, ts []*Token) bool {
         d.tz = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("15 hours").
+    Match("15 hours").
     Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("03 pm").
+    Match("03 pm").
     Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("04 mins").
+    Match("04 mins").
     Handle(func (d *Date, ts []*Token) bool {
         d.minute = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("05 secs").
+    Match("05 secs").
     Handle(func (d *Date, ts []*Token) bool {
         d.second = ts[0].V
         return true
@@ -60,7 +60,7 @@ var _ = Parser.Add().
 
 // 10:24:05
 var _ = Parser.Add().
-    MatchFmt("15:04:05").
+    Match("15:04:05").
     Handle(func (d *Date, ts []*Token) bool {
         d.hour = ts[0].V
         d.minute = ts[2].V
@@ -69,7 +69,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("15:04").
+    Match("15:04").
     Handle(func (d *Date, ts []*Token) bool {
         if d.hour == "" {
             d.hour = ts[0].V
@@ -83,7 +83,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("15:04 pm").
+    Match("15:04 pm").
     Handle(func (d *Date, ts []*Token) bool {
         if d.hour == "" {
             d.hour = ts[0].V
@@ -97,7 +97,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("2006-01-02").
+    Match("2006-01-02").
     Handle(func (d *Date, ts []*Token) bool {
         d.year = ts[0].V
         d.month = ts[2].V
@@ -106,7 +106,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("2006 01 02").
+    Match("2006 01 02").
     Handle(func (d *Date, ts []*Token) bool {
         d.year = ts[0].V
         d.month = ts[1].V
@@ -115,7 +115,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("02-01-2006").
+    Match("02-01-2006").
     Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[2].V
@@ -124,7 +124,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("02 01 2006").
+    Match("02 01 2006").
     Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[1].V
@@ -133,7 +133,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("01-02-2006").
+    Match("01-02-2006").
     Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
         d.day = ts[2].V
@@ -142,7 +142,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("01 02 2006").
+    Match("01 02 2006").
     Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
         d.day = ts[1].V
@@ -151,7 +151,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("02-01-06").
+    Match("02-01-06").
     Handle(func (d *Date, ts []*Token) bool {
         d.day = ts[0].V
         d.month = ts[2].V
@@ -160,29 +160,28 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("Jan").
+    Match("Jan").
     Handle(func (d *Date, ts []*Token) bool {
         d.month = ts[0].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("+-0700").
+    Match("+-0700").
     Handle(func (d *Date, ts []*Token) bool {
         d.tzoffset = ts[0].V + ts[1].V
         return true
     })
 
 var _ = Parser.Add().
-    // MatchFmt("-0700")
-    MatchFmt("+-07:00").
+    Match("+-07:00").
     Handle(func (d *Date, ts []*Token) bool {
         d.tzoffset = ts[0].V + ts[1].V + ts[3].V
         return true
     })
 
 var _ = Parser.Add().
-    MatchFmt("2006").
+    Match("2006").
     Handle(func (d *Date, ts []*Token) bool {
         if d.year != "" {
             return false
@@ -193,7 +192,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("02").
+    Match("02").
     Handle(func (d *Date, ts []*Token) bool {
         if d.day != "" {
             return false
@@ -204,7 +203,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("01").
+    Match("01").
     Handle(func (d *Date, ts []*Token) bool {
         if d.month != "" {
             return false
@@ -215,7 +214,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("06").
+    Match("06").
     Handle(func (d *Date, ts []*Token) bool {
         if d.year != "" {
             return false
@@ -226,7 +225,7 @@ var _ = Parser.Add().
     })
 
 var _ = Parser.Add().
-    MatchFmt("15").
+    Match("15").
     Handle(func (d *Date, ts []*Token) bool {
         if d.hour != "" {
             return false
@@ -237,60 +236,82 @@ var _ = Parser.Add().
     })
 
 
-// matchers
-var HH12 = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
-    "12"})
+// --- matchers
 
-var HH24 = MatchOr(HH12, Match([]string{"13", "14", "15", "16", "17", "18", 
-    "19", "20", "21", "22", "23"}))
-
-var HoursName = Match([]string{"h", "hour", "hours"})
-var AmPm = Match([]string{"am", "pm"})
-
-var MinsName = Match([]string{"m", "min", "mins", "minute", "minutes"})
-var SecsName = Match([]string{"s", "sec", "secs", "second", "seconds"})
-
-var Sep = Match([]string{" "})
-var DateSep = Match([]string{"-", "/", "."})
-var TimeSep = Match([]string{":"})
-var Sign = Match([]string{"-", "+"})
-
-var MM = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
-    "12"})
-
-var MonthName = Match([]string{"January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "Novemeber", "December",
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
-    "Nov", "Dec"})
-
-var Month = MatchOr(MonthName, MM)
-
-var DD = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
-    "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-    "24", "25", "26", "27", "28", "29", "30", "31"})
-
-var MINSEC = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+// 59-mins or 59-seconds
+var MINS = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
     "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
     "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35",
     "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47",
     "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59"})
 
+var SECS = MINS
+
+// 12-hours
+var HH12 = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12"})
+
+// 24-hours
+var HH24 = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"})
+
+// 31-days
+var DD = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
+    "24", "25", "26", "27", "28", "29", "30", "31"})
+
+// weekday names
 var Weekday = Match([]string{"Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday", "Sun", "Mon", "Tue", "Tues", "Wed",
     "Thu", "Thur", "Thurs", "Fri", "Sat"})
 
-var Whitespace = Match([]string{" ", "\n", "\t", "\r"})
+// 12-months
+var MM = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12"})
 
-var YYYY = MatchNumberLen(4)
+// month names
+var MonthName = Match([]string{"January", "February", "March", "April", "May",
+    "June", "July", "August", "September", "October", "Novemeber", "December",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
+    "Nov", "Dec"})
 
-// var HHMMSS = 
-var YY = MatchNumberLen(2)
-var TZOffset = MatchNumberLen(4)
+// month: either name or MM
+var Month = Match([]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12", "January", "February", "March", "April", "May",
+    "June", "July", "August", "September", "October", "Novemeber", "December",
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
+    "Nov", "Dec"})
 
+// 4-digit year
+var YYYY = &Matcher{
+    Match: func(t *Token) bool {
+        return t.IsNumber() && t.IsLen(4)
+    },
+}
+
+// 2-digit year
+var YY = &Matcher{
+    Match: func(t *Token) bool {
+        return t.IsNumber() && t.IsLen(2)
+    },
+}
+
+// 4-digits timezone offset: HHMM
+var TimezoneOffset = &Matcher{
+    Match: func(t *Token) bool {
+        return t.IsNumber() && t.IsLen(4) &&
+            HH12.Match(&Token{t.V[:2], t.T}) &&
+            MINS.Match(&Token{t.V[2:4], t.T})
+    },
+}
+
+// named timezone
 var Timezone = Match([]string{"ACDT", "ACST", "ACT", "ACWDT", "ACWST", "ADDT",
     "ADT", "AEDT", "AEST", "AFT", "AHDT", "AHST", "AKDT", "AKST", "AMST", "AMT",
     "ANT", "APT", "ARST", "ART", "AST", "AWDT", "AWST", "AWT", "AZOMT", "AZOST",
@@ -319,6 +340,16 @@ var Timezone = Match([]string{"ACDT", "ACST", "ACT", "ACWDT", "ACWST", "ADDT",
     "WARST", "WART", "WAST", "WAT", "WEMT", "WEST", "WET", "WFT", "WGST", "WGT",
     "WIB", "WIT", "WITA", "WMT", "WSDT", "WSST", "XJT", "YDDT", "YDT", "YPT",
     "YST", "YWT"})
+
+// formatting
+var HoursName = Match([]string{"h", "hour", "hours"})
+var MinsName = Match([]string{"m", "min", "mins", "minute", "minutes"})
+var SecsName = Match([]string{"s", "sec", "secs", "second", "seconds"})
+var DateSep = Match([]string{"-", "/", "."})
+var TimeSep = Match([]string{":"})
+
+var AmPm = Match([]string{"am", "pm"})
+var Sign = Match([]string{"-", "+"})
 
 
 
