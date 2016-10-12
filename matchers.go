@@ -3,6 +3,7 @@ package dateparser
 type MatchFn func(*Token) bool
 
 type Matcher struct {
+    Fmt string
     Match MatchFn
 }
 

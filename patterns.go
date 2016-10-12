@@ -8,7 +8,7 @@ type HandleFn func(d *Date, ts []*Token) bool
 
 type Pattern struct {
     children []*Pattern
-    Matches []MatchFn
+    Matchers []MatchFn
     HandleFn HandleFn
 }
 
@@ -45,11 +45,11 @@ func (p *Pattern) Parse(b []byte) *Date {
 }
 
 func (p *Pattern) parse(d *Date, ts []*Token) int {
-    if len(ts) < len(p.Matches) {
+    if len(ts) < len(p.Matchers) {
         return 0
     }
 
-    for i, match := range p.Matches {
+    for i, match := range p.Matchers {
         if !match(ts[i]) {
             return 0 // unmatched.
         }
@@ -66,7 +66,7 @@ func (p *Pattern) parse(d *Date, ts []*Token) int {
     }
 
     if p.HandleFn(d, ts) {
-        return len(p.Matches)
+        return len(p.Matchers)
     } else {
         return 0
     }
@@ -121,7 +121,7 @@ func (p *Pattern) Match(s string) *Pattern {
         }
     }
 
-    p.Matches = matchers
+    p.Matchers = matchers
     return p
 }
 
