@@ -17,6 +17,11 @@ type Date struct {
 }
 
 func (d *Date) AddDefault(t *time.Time) *Date {
+    if t == nil {
+        zero := time.Time{}
+        t = &zero
+    }
+
     if d.year == 0 {
         d.year = t.Year()
     }
@@ -26,18 +31,18 @@ func (d *Date) AddDefault(t *time.Time) *Date {
     if d.day == 0 {
         d.day = t.Day()
     }
-    if d.hour == 0 {
-        d.hour = t.Hour()
-    }
-    if d.minute == 0 {
-        d.minute = t.Minute()
-    }
-    if d.second == 0 {
-        d.second = t.Second()
-    }
-    if d.tz == nil {
-        d.tz = t.Location()
-    }
+    // if d.hour == 0 {
+    //     d.hour = t.Hour()
+    // }
+    // if d.minute == 0 {
+    //     d.minute = t.Minute()
+    // }
+    // if d.second == 0 {
+    //     d.second = t.Second()
+    // }
+    // if d.tz == nil {
+    //     d.tz = t.Location()
+    // }
 
     return d
 }
